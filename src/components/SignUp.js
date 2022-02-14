@@ -35,7 +35,8 @@ const  SignUp = () => {
             name="email"
             type="email"
             placeholder="email"
-            onChange={(event) => handleChangeEmail(event)} />
+            onChange={(event) => handleChangeEmail(event)}
+            />
         </div>
         <div>
           <label>パスワード</label>
