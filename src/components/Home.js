@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { useAuthContext } from '../context/AuthContext';
 import { useState, useEffect } from "react";
-import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc, where, query } from "firebase/firestore";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -57,7 +57,17 @@ const Home = () => {
     const userDocumentRef = doc(db, 'users', id);
     await deleteDoc(userDocumentRef);
   };
-  
+
+  const deleteUserByName = async (name) => {
+    const usersCollectionRef = collection(db, "users");
+    const q = query(usersCollectionRef, where("name", "==", name));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (document) => {
+      const userDocumentRef = doc(db, "users", document.id);
+      await deleteDoc(userDocumentRef);
+    });
+  };
+
   if (!user) {
     return <Navigate to="/login"/>
   } else {
@@ -73,6 +83,7 @@ const Home = () => {
             <div key={user.id}>
               <span>{user.name}</span>
               <button onClick={() => deleteUser(user.id)}>削除</button>
+              <button onClick={() => deleteUserByName(user.name)} style={{ color: "red" }}>削除</button>
             </div>
           ))}
           <hr />
