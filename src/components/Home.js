@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { useAuthContext } from '../context/AuthContext';
 import { useState, useEffect } from "react";
-import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc, where, query, updateDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc, where, query, updateDoc, orderBy, limit } from "firebase/firestore";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -16,10 +16,16 @@ const Home = () => {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     const usersCollectionRef = collection(db, 'users');
+    const q = query(
+      usersCollectionRef, 
+      // where("admin", "==", true), 
+      orderBy('name', 'desc'), 
+      // limit(3)
+    );
     // getDocs(usersCollectionRef).then((querySnapshot) => {
     //   setUsers(querySnapshot.docs.map((doc) => doc.data()))
     // });
-    const unsub = onSnapshot(usersCollectionRef, (querySnap) => {
+    const unsub = onSnapshot(q, (querySnap) => {
       setUsers(querySnap.docs.map((doc) => ({
         ...doc.data(), id: doc.id})));
     });
