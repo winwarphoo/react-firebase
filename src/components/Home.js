@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { useAuthContext } from '../context/AuthContext';
 import { useState, useEffect } from "react";
-import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc } from "firebase/firestore";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -52,6 +52,11 @@ const Home = () => {
       console.log(documentRef.id, docSnap.data())
     ); 
   };
+
+  const deleteUser = async (id) => {
+    const userDocumentRef = doc(db, 'users', id);
+    await deleteDoc(userDocumentRef);
+  };
   
   if (!user) {
     return <Navigate to="/login"/>
@@ -65,7 +70,10 @@ const Home = () => {
         <div>
           <button onClick={dbTest}>TEST</button>
           {users.map((user) => (
-            <div key={user.id}>{user.name}</div>
+            <div key={user.id}>
+              <span>{user.name}</span>
+              <button onClick={() => deleteUser(user.id)}>削除</button>
+            </div>
           ))}
           <hr />
           <form onSubmit={handleSubmit}>
