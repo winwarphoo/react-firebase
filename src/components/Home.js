@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { useAuthContext } from '../context/AuthContext';
 import { useState, useEffect } from "react";
-import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc, where, query } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, onSnapshot, addDoc, serverTimestamp, deleteDoc, where, query, updateDoc } from "firebase/firestore";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -68,6 +68,11 @@ const Home = () => {
     });
   };
 
+  const changeAdmin = async (id, checked) => {
+    const userDocumentRef = doc(db, 'users', id);
+    await updateDoc(userDocumentRef, { admin: checked });
+  };
+
   if (!user) {
     return <Navigate to="/login"/>
   } else {
@@ -84,6 +89,14 @@ const Home = () => {
               <span>{user.name}</span>
               <button onClick={() => deleteUser(user.id)}>削除</button>
               <button onClick={() => deleteUserByName(user.name)} style={{ color: "red" }}>削除</button>
+              {!user.admin && (
+                <button onClick={() => changeAdmin(user.id)}>admin</button>
+              )}
+              <input 
+                type="checkbox" 
+                name='admin' 
+                onChange={(event) => changeAdmin(user.id, event.target.checked)} 
+                checked={user.admin} />
             </div>
           ))}
           <hr />
